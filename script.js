@@ -34,6 +34,7 @@ const PLOTLY_CONFIG = { displayModeBar: false, responsive: true };
 
 // NOTE: Exclusion rules (isNonMedicalCode, isNonMedicalGroup) are loaded from
 // filters.js which MUST be included before this script in the HTML.
+function setDlRow(rowId, onCsv, onXlsx) {
   const row = document.getElementById(rowId);
   if (!row) return;
   row.innerHTML = '<button class="dl-btn">⬇ CSV</button><button class="dl-btn">⬇ Excel</button>';
@@ -94,17 +95,6 @@ function getPlotlyThemeColors() {
     bg:     'rgba(0,0,0,0)',
   };
 }
-
-const PLOTLY_LAYOUT = {
-  paper_bgcolor: "rgba(0,0,0,0)", plot_bgcolor: "rgba(0,0,0,0)",
-  font: { family: "Inter, IBM Plex Sans, sans-serif", color: "#7a97b0", size: 12 },
-  xaxis: { gridcolor: "#1e2e3d", zerolinecolor: "#1e2e3d", tickfont: { color: "#7a97b0" } },
-  yaxis: { gridcolor: "#1e2e3d", zerolinecolor: "#1e2e3d", tickfont: { color: "#7a97b0" } },
-  legend: { bgcolor: "rgba(0,0,0,0)", font: { color: "#7a97b0" } },
-  margin: { l: 20, r: 20, t: 40, b: 40 },
-  colorway: COLORWAY,
-};
-const PLOTLY_CONFIG = { displayModeBar: false, responsive: true };
 
 // ── STATE ──────────────────────────────────────────────────────────────────
 let rawDf  = [];
@@ -3535,4 +3525,3 @@ function renderConcentration() {
     renderPage("branch");
   });
 }
-
