@@ -34,7 +34,7 @@ const PLOTLY_CONFIG = { displayModeBar: false, responsive: true };
 
 // NOTE: Exclusion rules (isNonMedicalCode, isNonMedicalGroup) are loaded from
 // filters.js which MUST be included before this script in the HTML.
-function setDlRow(rowId, onCsv, onXlsx) {
+function injectDlButtons(rowId, onCsv, onXlsx) {
   const row = document.getElementById(rowId);
   if (!row) return;
   row.innerHTML = '<button class="dl-btn">⬇ CSV</button><button class="dl-btn">⬇ Excel</button>';
@@ -2159,7 +2159,14 @@ function renderBranch() {
   const df = aggregateByMappedMaterial(baseDf);
 
   const tabsHtml = `
-    <div id="branch-tab-material"></div>`;
+    <div class="branch-tab-bar" style="display:flex;gap:0.5rem;margin-top:1.5rem;margin-bottom:0;border-bottom:2px solid var(--border2);overflow-x:auto;-webkit-overflow-scrolling:touch">
+      <button class="branch-tab-btn" data-tab="value"    style="padding:0.5rem 1.1rem;border:none;border-bottom:2px solid var(--blue);background:transparent;color:var(--blue);font-weight:700;font-size:0.82rem;cursor:pointer;margin-bottom:-2px;font-family:inherit;white-space:nowrap;flex-shrink:0">📊 Total Value</button>
+      <button class="branch-tab-btn" data-tab="material" style="padding:0.5rem 1.1rem;border:none;border-bottom:2px solid transparent;background:transparent;color:var(--muted);font-weight:500;font-size:0.82rem;cursor:pointer;margin-bottom:-2px;font-family:inherit;white-space:nowrap;flex-shrink:0">🧪 Material Across Branches</button>
+    </div>
+    <div id="branch-tab-value" class="branch-tab-panel" style="display:block;padding-top:1rem">
+      <div id="branch-dl-row" style="display:flex;gap:0.6rem;justify-content:flex-end;margin-bottom:0.5rem"></div>
+    </div>
+    <div id="branch-tab-material" class="branch-tab-panel" style="display:none;padding-top:1rem"></div>`;
   document.getElementById("branch-tabs-wrap").innerHTML = tabsHtml;
 
   // FIX-R7: replaced native <select multiple> with buildMultiSelect for UX consistency.
@@ -2215,10 +2222,12 @@ function renderBranch() {
       {key:"Items",           label:"# Unique Materials"},
     ];
     wrap.innerHTML = `
+      <div id="branch-dl-row" style="display:flex;gap:0.6rem;justify-content:flex-end;margin-bottom:0.5rem"></div>
       <div id="branch-chart-wrap" style="margin-bottom:1.2rem"></div>
       <div id="branch-table-wrap-inner" style="margin-bottom:1rem">${buildTable(compareDf, bCols, r => r.PlantName === centralName ? "row-blue" : "")}</div>`;
-    document.getElementById("btn-dl-branch-csv").onclick  = () => downloadCSV(compareDf,   bCols, "branch_comparison.csv");
-    document.getElementById("btn-dl-branch-xlsx").onclick = () => downloadExcel(compareDf, bCols, "branch_comparison.xlsx");
+    injectDlButtons("branch-dl-row",
+      () => downloadCSV(compareDf,   bCols, "branch_comparison.csv"),
+      () => downloadExcel(compareDf, bCols, "branch_comparison.xlsx"));
 
     // BUG-BRANCH-CHART FIX: render a grouped bar chart comparing branches by value category
     const sorted = [...compareDf].sort((a,b) => {
